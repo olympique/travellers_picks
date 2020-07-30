@@ -15,13 +15,14 @@ var geocoder = NodeGeocoder(options);
 
 // INDEX route - show all campgrounds
 router.get("/campgrounds", function(req, res){
-	Campground.find({}, function(err, allCampgrounds){
-		if(err){
-			console.log(err);
-		} else {
-			res.render("campgrounds/index", {campgrounds:allCampgrounds});
-		}
-	});	
+    // Get all campgrounds from DB
+    Campground.find({}, function(err, allCampgrounds){
+    	if(err){
+           	console.log(err);
+       	} else {
+          	res.render("campgrounds/index", {campgrounds: allCampgrounds, page: "campgrounds"});
+       	}
+    });
 });
 
 // NEW route - show form to create a new campground
