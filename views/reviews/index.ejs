@@ -4,7 +4,7 @@
     <div class="row">
         <div class="col-md-12">
             <h1 style="text-align: center">Review Page: <%= campground.name %></h1>
-            <a href="/campgrounds/<%= campground._id %>">Go back to the campground page</a>
+            <a href="/campgrounds/<%= campground.slug %>">Go back to the campground page</a>
             <div class="thumbnail">
                 <div class="caption-full">
                     <% if (campground.rating === 0) { %>
@@ -39,8 +39,8 @@
                             </p>
                             <% if(currentUser && review.author.id.equals(currentUser._id)){ %>
                             <a class="btn btn-xs btn-warning"
-                               href="/campgrounds/<%=campground._id %>/reviews/<%=review._id %>/edit">Edit</a>
-                            <form class="delete-form" action="/campgrounds/<%=campground._id %>/reviews/<%=review._id %>?_method=DELETE" method="POST">
+                               href="/campgrounds/<%=campground.slug %>/reviews/<%=review._id %>/edit">Edit</a>
+                            <form class="delete-form" action="/campgrounds/<%=campground.slug %>/reviews/<%=review._id %>?_method=DELETE" method="POST">
                                 <input type="submit" class="btn btn-xs btn-danger" value="Delete">
                             </form>
                             <% } %>
@@ -50,11 +50,11 @@
                     <% }); %>
                     <% } %>
                     <div>
-                        <a class="btn btn-primary <% if (currentUser && campground.reviews.some(function (review) {return review.author.id.equals(currentUser._id)})) { %> disabled <% } %>" href="/campgrounds/<%= campground._id %>/reviews/new">
+                        <a class="btn btn-primary <% if (currentUser && campground.reviews.some(function (review) {return review.author.id.equals(currentUser._id)})) { %> disabled <% } %>" href="/campgrounds/<%= campground.slug %>/reviews/new">
                             Write a New Review</a>
                     </div>
                     <div style="margin-top: 10px;">
-                        <a class="btn btn-default" href="/campgrounds/<%= campground._id %>"><i class="fa fa-arrow-left"></i> Go back</a>
+                        <a class="btn btn-default" href="/campgrounds/<%= campground.slug %>"><i class="fa fa-arrow-left"></i> Go back</a>
                     </div>
                 </div>
             </div>

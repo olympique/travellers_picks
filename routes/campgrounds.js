@@ -66,9 +66,8 @@ router.post("/campgrounds", middleware.isLoggedIn, function(req, res){
 });
 
 // SHOW route - shows info about one campground
-router.get("/campgrounds/:id", function(req, res){
-	// find the campground with given ID
-	Campground.findById(req.params.id).populate("comments likes").populate({
+router.get("/campgrounds/:slug", function(req, res){
+	Campground.findOne({slug: req.params.slug}).populate("comments likes").populate({
         path: "reviews",
         options: {sort: {createdAt: -1}}
     }).exec(function(err, foundCampground){
@@ -83,8 +82,8 @@ router.get("/campgrounds/:id", function(req, res){
 });
 
 // LIKE route - like a campground
-router.post("/campgrounds/:id/like", middleware.isLoggedIn, function (req, res) {
-    Campground.findById(req.params.id, function (err, foundCampground) {
+router.post("/campgrounds/:slug/like", middleware.isLoggedIn, function (req, res) {
+    Campground.findOne({slug: req.params.slug}, function (err, foundCampground) {
         if (err) {
             console.log(err);
             return res.redirect("/campgrounds");
@@ -108,21 +107,21 @@ router.post("/campgrounds/:id/like", middleware.isLoggedIn, function (req, res) 
                 console.log(err);
                 return res.redirect("/campgrounds");
             }
-            return res.redirect("/campgrounds/" + foundCampground._id);
+            return res.redirect("/campgrounds/" + foundCampground.slug);
         });
     });
 });
 
 // EDIT route - edit a campground
-router.get("/campgrounds/:id/edit", middleware.checkCampgroundOwnership, function(req, res){
-	Campground.findById(req.params.id, function(err, foundCampground){
+router.get("/campgrounds/:slug/edit", middleware.checkCampgroundOwnership, function(req, res){
+	Campground.findOne({slug: req.params.slug}, function (err, foundCampground) {
 		// render edit template with the campground
 		res.render("campgrounds/edit", {campground: foundCampground});
 	});
 });
 
 // UPDATE route - update a campground
-router.put("/campgrounds/:id", middleware.checkCampgroundOwnership, function(req, res){
+router.put("/campgrounds/:slug", middleware.checkCampgroundOwnership, function(req, res){
   	geocoder.geocode(req.body.location, function (err, data) {
     	if (err || !data.length) {
       		req.flash("error", "Invalid address!");
@@ -133,16 +132,8 @@ router.put("/campgrounds/:id", middleware.checkCampgroundOwnership, function(req
 		req.body.campground.location = data[0].formattedAddress;
 		
 		delete req.body.campground.rating;
-		// Campground.findByIdAndUpdate(req.params.id, req.body.campground, function(err, campground){
-		// 	if(err){
-		// 		req.flash("error", err.message);
-		// 		res.redirect("back");
-		// 	} else {
-		// 		req.flash("success","Destination successfully updated!");
-		// 		res.redirect("/campgrounds/" + req.params.id);
-		// 	}
-		// });
-		Campground.findById(req.params.id, function (err, campground) {
+
+		Campground.findOne({slug: req.params.slug}, function (err, campground) {
 			if (err) {
 				console.log(err);
 				res.redirect("/campgrounds");
@@ -155,7 +146,7 @@ router.put("/campgrounds/:id", middleware.checkCampgroundOwnership, function(req
 						console.log(err);
 						res.redirect("/campgrounds");
 					} else {
-						res.redirect("/campgrounds/" + campground._id);
+						res.redirect("/campgrounds/" + campground.slug);
 					}
 				});
 			}
@@ -163,20 +154,9 @@ router.put("/campgrounds/:id", middleware.checkCampgroundOwnership, function(req
   	});
 });
 
-// DESTROY route - delete a campground
-// router.delete("/campgrounds/:id", middleware.checkCampgroundOwnership, function(req, res){
-//    Campground.findByIdAndRemove(req.params.id, function(err){
-//       if(err){
-//           res.redirect("/campgrounds");
-//       } else {
-//           res.redirect("/campgrounds");
-//       }
-//    });
-// });
-
 // DESTROY route - delete a campground along with all reviews and comments associated with it
-router.delete("/campgrounds/:id", middleware.checkCampgroundOwnership, function (req, res) {
-    Campground.findById(req.params.id, function (err, campground) {
+router.delete("/campgrounds/:slug", middleware.checkCampgroundOwnership, function (req, res) {
+	Campground.findOne({slug: req.params.slug}, function (err, campground) {
         if (err) {
             res.redirect("/campgrounds");
         } else {
