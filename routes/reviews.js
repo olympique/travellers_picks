@@ -5,7 +5,7 @@ var Review = require("../models/review");
 var middleware = require("../middleware");
 
 // Reviews Index
-router.get("/", function (req, res) {
+router.get("/campgrounds/:id/reviews", function (req, res) {
     Campground.findById(req.params.id).populate({
         path: "reviews",
         options: {sort: {createdAt: -1}} // sorting the populated reviews array to show the latest first
@@ -19,7 +19,7 @@ router.get("/", function (req, res) {
 });
 
 // Reviews New
-router.get("/new", middleware.isLoggedIn, middleware.checkReviewExistence, function (req, res) {
+router.get("/campgrounds/:id/reviews/new", middleware.isLoggedIn, middleware.checkReviewExistence, function (req, res) {
     // middleware.checkReviewExistence checks if a user already reviewed the campground, only one review per user is allowed
     Campground.findById(req.params.id, function (err, campground) {
         if (err) {
@@ -32,7 +32,7 @@ router.get("/new", middleware.isLoggedIn, middleware.checkReviewExistence, funct
 });
 
 // Reviews Create
-router.post("/", middleware.isLoggedIn, middleware.checkReviewExistence, function (req, res) {
+router.post("/campgrounds/:id/reviews", middleware.isLoggedIn, middleware.checkReviewExistence, function (req, res) {
     //lookup campground using ID
     Campground.findById(req.params.id).populate("reviews").exec(function (err, campground) {
         if (err) {
@@ -62,7 +62,7 @@ router.post("/", middleware.isLoggedIn, middleware.checkReviewExistence, functio
 });
 
 // Reviews Edit
-router.get("/:review_id/edit", middleware.checkReviewOwnership, function (req, res) {
+router.get("/campgrounds/:id/reviews/:review_id/edit", middleware.checkReviewOwnership, function (req, res) {
     Review.findById(req.params.review_id, function (err, foundReview) {
         if (err) {
             req.flash("error", err.message);
@@ -73,7 +73,7 @@ router.get("/:review_id/edit", middleware.checkReviewOwnership, function (req, r
 });
 
 // Reviews Update
-router.put("/:review_id", middleware.checkReviewOwnership, function (req, res) {
+router.put("/campgrounds/:id/reviews/:review_id", middleware.checkReviewOwnership, function (req, res) {
     Review.findByIdAndUpdate(req.params.review_id, req.body.review, {new: true}, function (err, updatedReview) {
         if (err) {
             req.flash("error", err.message);
@@ -95,7 +95,7 @@ router.put("/:review_id", middleware.checkReviewOwnership, function (req, res) {
 });
 
 // Reviews Delete
-router.delete("/:review_id", middleware.checkReviewOwnership, function (req, res) {
+router.delete("/campgrounds/:id/reviews/:review_id", middleware.checkReviewOwnership, function (req, res) {
     Review.findByIdAndRemove(req.params.review_id, function (err) {
         if (err) {
             req.flash("error", err.message);
