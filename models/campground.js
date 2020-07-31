@@ -60,8 +60,9 @@ campgroundSchema.pre('save', async function (next) {
     }
 });
 
+var Campground = mongoose.model("Campground", campgroundSchema);
 
-module.exports = mongoose.model("Campground", campgroundSchema);
+module.exports = Campground;
 
 async function generateUniqueSlug(id, campgroundName, slug) {
     try {
