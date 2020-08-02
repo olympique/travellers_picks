@@ -54,7 +54,7 @@ router.get("/campgrounds/new", middleware.isLoggedIn, function(req, res){
 });
 
 // CREATE route - create and add a new campground
-router.post("/", middleware.isLoggedIn, upload.single('image'), function(req, res) {
+router.post("/campgrounds", middleware.isLoggedIn, upload.single('image'), function(req, res) {
 	cloudinary.v2.uploader.upload(req.file.path, function(err, result) {
 		if(err) {
 			req.flash("error", err.message);
