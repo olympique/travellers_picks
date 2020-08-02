@@ -24,8 +24,9 @@ var cloudinary = require("cloudinary");
 cloudinary.config({ 
   	cloud_name: "olympique", 
 	api_key: 167832272272284,
+	api_secret: Fuyzp_zVWTe2lXBVVAakiq-T7UY
   	// api_key: process.env.CLOUDINARY_API_KEY, 
-  	api_secret: process.env.CLOUDINARY_API_SECRET
+  	// api_secret: process.env.CLOUDINARY_API_SECRET
 });
  
 var options = {
