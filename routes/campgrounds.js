@@ -14,15 +14,15 @@ var storage = multer.diskStorage({
 var imageFilter = function (req, file, cb) {
     // accept image files only
     if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
-        return cb(new Error('Please upload an image file.'), false);
+        return cb(new Error("Please upload an image file."), false);
     }
     cb(null, true);
 };
-var upload = multer({ storage: storage, fileFilter: imageFilter})
+var upload = multer({storage: storage, fileFilter: imageFilter})
 
-var cloudinary = require('cloudinary');
+var cloudinary = require("cloudinary");
 cloudinary.config({ 
-  cloud_name: 'olympique', 
+  cloud_name: "olympique", 
   api_key: process.env.CLOUDINARY_API_KEY, 
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
