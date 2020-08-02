@@ -54,7 +54,7 @@ router.get("/campgrounds/new", middleware.isLoggedIn, function(req, res){
 });
 
 // CREATE route - create and add a new campground
-router.post("/campgrounds", middleware.isLoggedIn, upload.single('image'), function(req, res) {
+router.post("/campgrounds", middleware.isLoggedIn, upload.single("image"), function(req, res) {
 	cloudinary.v2.uploader.upload(req.file.path, function(err, result) {
 		if(err) {
 			req.flash("error", err.message);
@@ -89,13 +89,13 @@ router.post("/campgrounds", middleware.isLoggedIn, upload.single('image'), funct
 			var lng = data[0].longitude;
 			var location = data[0].formattedAddress;
 			var newCampground = {
-				name: name, 
+				name: name,
+				price: price,
 				image: image,
-				cost: cost,
 				description: desc, 
-				author:author, 
-				location: location, 
-				lat: lat, 
+				author: author,
+				location: location,
+				lat: lat,
 				lng: lng
 			};
 			// Create a new campground and save to DB
