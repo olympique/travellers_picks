@@ -68,10 +68,11 @@ router.post("/campgrounds", middleware.isLoggedIn, function(req, res){
 // SHOW route - shows info about one campground
 router.get("/campgrounds/:slug", function(req, res){
 	Campground.findOne({slug: req.params.slug}).populate("comments likes").populate({
-        path: "reviews",
-        options: {sort: {createdAt: -1}}
-    }).exec(function(err, foundCampground){
+	path: "reviews",
+	options: {sort: {createdAt: -1}}
+	}).exec(function(err, foundCampground){
 		if(err || !foundCampground){
+			console.log(err);
 			req.flash("error", "Destination not found!");
 			res.redirect("back");
 		} else {
@@ -139,8 +140,12 @@ router.put("/campgrounds/:slug", middleware.checkCampgroundOwnership, function(r
 				res.redirect("/campgrounds");
 			} else {
 				campground.name = req.body.campground.name;
-				campground.description = req.body.campground.description;
+				campground.price = req.body.campground.price;
 				campground.image = req.body.campground.image;
+				campground.description = req.body.campground.description;
+				campground.lat = req.body.campground.lat;
+				campground.lng = req.body.campground.lng;
+				campground.location = req.body.campground.location;
 				campground.save(function (err) {
 					if (err) {
 						console.log(err);

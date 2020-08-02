@@ -160,16 +160,16 @@
 				<% } %>
 				
 				<!--Display comments by looping through them-->
-				<% campground.comments.forEach(function(comment){  %>
+				<% campground.comments.forEach(function(comment) { %>
 					<div class="row">
 						<div class="col-md-12">
 							<strong>
 							  	<% if (currentUser && currentUser._id.equals(comment.author.id)) { %>
-								<!--If the current user owns the comment, change the color of the user icon-->
-								<span style="color: orange;" class="glyphicon glyphicon-user" aria-hidden="true"></span>
+									<!--If the current user owns the comment, change the color of the user icon-->
+									<span style="color: orange;" class="glyphicon glyphicon-user" aria-hidden="true"></span>
 							  	<% } else { %>
-								<!--Else just display it black-->
-								<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+									<!--Else just display it black-->
+									<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
 							  	<% } %>
 								<!--Print out the author username-->
 							  	<%= comment.author.username %>
@@ -182,7 +182,6 @@
 								<%= comment.text %>
 							</p>
 							
-							
 							<!--If the visitor is logged in and the owner of the comment, show the edit and delete buttons-->
 							<% if (currentUser && currentUser._id.equals(comment.author.id)) { %>
 						  		<!--Edit button used for collapsing the edit comment form-->
@@ -193,6 +192,7 @@
 								<form class="delete-form" action="/campgrounds/<%= campground.slug %>/comments/<%= comment._id %>?_method=DELETE" method="POST">
 									<button class="btn btn-xs btn-danger">Delete</button>
 								</form>
+							
 							  	<!--Edit comment form-->
 							  	<div class="collapse" id="collapseEdit<%= comment._id %>">
 									<div class="well" style="border-left: 5px solid #ffbb33; margin-top: 15px;">
@@ -213,7 +213,7 @@
 							<% } %>
 						  	<hr>
 						</div>
-					 </div>
+					</div>
 				<% }) %>
 			</div>
 			<!--COMMENT SECTION END-->
