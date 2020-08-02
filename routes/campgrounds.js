@@ -61,16 +61,17 @@ router.post("/campgrounds", middleware.isLoggedIn, upload.single("image"), funct
 		if(err) {
 			req.flash("error", err.message);
 			return res.redirect("back");
-			}
-			// add cloudinary url for the image to the campground object under image property
-			req.body.image = result.secure_url;
-			// add image's public_id to campground object
-			req.body.imageId = result.public_id;
-			// add author to campground
-			req.body.author = {
-				id: req.user._id,
-				username: req.user.username
-			}
+		}
+		// add cloudinary url for the image to the campground object under image property
+		req.body.image = result.secure_url;
+		// add image's public_id to campground object
+		req.body.imageId = result.public_id;
+		// add author to campground
+		req.body.author = {
+			id: req.user._id,
+			username: req.user.username
+		}
+		
 		geocoder.geocode(req.body.location, function (err, data) {
 			if (err || !data.length) {
 				console.log(err);
@@ -82,7 +83,7 @@ router.post("/campgrounds", middleware.isLoggedIn, upload.single("image"), funct
 			var price = req.body.price;
 			var image = req.body.image;
 			var imageId = req.body.imageId;
-			var desc = req.body.description;
+			var description = req.body.description;
 			var author = {
 				id: req.user._id,
 				username: req.user.username
@@ -94,7 +95,7 @@ router.post("/campgrounds", middleware.isLoggedIn, upload.single("image"), funct
 				name: name,
 				price: price,
 				image: image,
-				description: desc, 
+				description: description, 
 				author: author,
 				location: location,
 				lat: lat,
@@ -170,41 +171,60 @@ router.get("/campgrounds/:slug/edit", middleware.checkCampgroundOwnership, funct
 });
 
 // UPDATE route - update a campground
-router.put("/campgrounds/:slug", middleware.checkCampgroundOwnership, function(req, res){
-  	geocoder.geocode(req.body.location, function (err, data) {
-    	if (err || !data.length) {
-      		req.flash("error", "Invalid address!");
-      		return res.redirect("back");
-    	}
-		req.body.campground.lat = data[0].latitude;
-		req.body.campground.lng = data[0].longitude;
-		req.body.campground.location = data[0].formattedAddress;
+router.put("/campgrounds/:slug", middleware.checkCampgroundOwnership, upload.single("image"), function(req, res){
+	cloudinary.v2.uploader.upload(req.file.path, function(err, result) {
+		if(err) {
+			req.flash("error", err.message);
+			return res.redirect("back");
+		}
+		// add cloudinary url for the image to the campground object under image property
+		req.body.image = result.secure_url;
+		// add image's public_id to campground object
+		req.body.imageId = result.public_id;
+		// add author to campground
+		req.body.author = {
+			id: req.user._id,
+			username: req.user.username
+		}
 		
-		delete req.body.campground.rating;
-
-		Campground.findOne({slug: req.params.slug}, function (err, campground) {
-			if (err) {
+		geocoder.geocode(req.body.location, function (err, data) {
+			if (err || !data.length) {
 				console.log(err);
-				res.redirect("/campgrounds");
-			} else {
-				campground.name = req.body.campground.name;
-				campground.price = req.body.campground.price;
-				campground.image = req.body.campground.image;
-				campground.description = req.body.campground.description;
-				campground.lat = req.body.campground.lat;
-				campground.lng = req.body.campground.lng;
-				campground.location = req.body.campground.location;
-				campground.save(function (err) {
-					if (err) {
-						console.log(err);
-						res.redirect("/campgrounds");
-					} else {
-						res.redirect("/campgrounds/" + campground.slug);
-					}
-				});
+				req.flash("error", "Invalid address!");
+				return res.redirect("back");
 			}
+
+			req.body.lat = data[0].latitude;
+			req.body.lng = data[0].longitude;
+			req.body.location = data[0].formattedAddress;
+
+			delete req.body.rating;
+
+			Campground.findOne({slug: req.params.slug}, function (err, campground) {
+				if (err) {
+					console.log(err);
+					res.redirect("/campgrounds");
+				} else {
+					campground.name = req.body.name;
+					campground.price = req.body.price;
+					campground.image = req.body.image;
+					campground.description = req.body.description;
+					campground.lat = req.body.lat;
+					campground.lng = req.body.lng;
+					campground.location = req.body.location;
+					campground.save(function (err) {
+						if (err) {
+							console.log(err);
+							req.flash("error", err.message);
+							return res.redirect("back");
+						} else {
+							res.redirect("/campgrounds/" + campground.slug);
+						}
+					});
+				}
+			});
 		});
-  	});
+	});
 });
 
 // DESTROY route - delete a campground along with all reviews and comments associated with it
