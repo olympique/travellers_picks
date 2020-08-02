@@ -106,7 +106,7 @@ router.post("/campgrounds", middleware.isLoggedIn, upload.single("image"), funct
 					req.flash("error", err.message);
 					return res.redirect("back");
 				} else {
-				res.redirect('/campgrounds/' + campground.slug);
+				res.redirect("/campgrounds/" + campground.slug);
 				}	
 			});
 		});

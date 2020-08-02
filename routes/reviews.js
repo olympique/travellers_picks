@@ -5,8 +5,8 @@ var Review = require("../models/review");
 var middleware = require("../middleware");
 
 // Reviews Index
-router.get("/campgrounds/:id/reviews", function (req, res) {
-    Campground.findById(req.params.id).populate({
+router.get("/campgrounds/:slug/reviews", function (req, res) {
+	Campground.findOne({slug: req.params.slug}).populate({
         path: "reviews",
         options: {sort: {createdAt: -1}} // sorting the populated reviews array to show the latest first
     }).exec(function (err, campground) {
@@ -19,9 +19,9 @@ router.get("/campgrounds/:id/reviews", function (req, res) {
 });
 
 // Reviews New
-router.get("/campgrounds/:id/reviews/new", middleware.isLoggedIn, middleware.checkReviewExistence, function (req, res) {
+router.get("/campgrounds/:slug/reviews/new", middleware.isLoggedIn, middleware.checkReviewExistence, function (req, res) {
     // middleware.checkReviewExistence checks if a user already reviewed the campground, only one review per user is allowed
-    Campground.findById(req.params.id, function (err, campground) {
+	Campground.findOne({slug: req.params.slug}, function(err, campground){
         if (err) {
             req.flash("error", err.message);
             return res.redirect("back");
@@ -32,9 +32,8 @@ router.get("/campgrounds/:id/reviews/new", middleware.isLoggedIn, middleware.che
 });
 
 // Reviews Create
-router.post("/campgrounds/:id/reviews", middleware.isLoggedIn, middleware.checkReviewExistence, function (req, res) {
-    //lookup campground using ID
-    Campground.findById(req.params.id).populate("reviews").exec(function (err, campground) {
+router.post("/campgrounds/:slug/reviews", middleware.isLoggedIn, middleware.checkReviewExistence, function (req, res) {
+	Campground.findOne({slug: req.params.slug}).populate("reviews").exec(function (err, campground) {
         if (err) {
             req.flash("error", err.message);
             return res.redirect("back");
@@ -56,30 +55,30 @@ router.post("/campgrounds/:id/reviews", middleware.isLoggedIn, middleware.checkR
             //save campground
             campground.save();
             req.flash("success", "Your review has been successfully added.");
-            res.redirect('/campgrounds/' + campground._id);
+            res.redirect("/campgrounds/" + campground.slug);
         });
     });
 });
 
 // Reviews Edit
-router.get("/campgrounds/:id/reviews/:review_id/edit", middleware.checkReviewOwnership, function (req, res) {
+router.get("/campgrounds/:slug/reviews/:review_id/edit", middleware.checkReviewOwnership, function (req, res) {
     Review.findById(req.params.review_id, function (err, foundReview) {
         if (err) {
             req.flash("error", err.message);
             return res.redirect("back");
         }
-        res.render("reviews/edit", {campground_id: req.params.id, review: foundReview});
+        res.render("reviews/edit", {campground_slug: req.params.slug, review: foundReview});
     });
 });
 
 // Reviews Update
-router.put("/campgrounds/:id/reviews/:review_id", middleware.checkReviewOwnership, function (req, res) {
+router.put("/campgrounds/:slug/reviews/:review_id", middleware.checkReviewOwnership, function (req, res) {
     Review.findByIdAndUpdate(req.params.review_id, req.body.review, {new: true}, function (err, updatedReview) {
         if (err) {
             req.flash("error", err.message);
             return res.redirect("back");
         }
-        Campground.findById(req.params.id).populate("reviews").exec(function (err, campground) {
+		Campground.findOne({slug: req.params.slug}).populate("reviews").exec(function (err, campground) {
             if (err) {
                 req.flash("error", err.message);
                 return res.redirect("back");
@@ -89,19 +88,19 @@ router.put("/campgrounds/:id/reviews/:review_id", middleware.checkReviewOwnershi
             //save changes
             campground.save();
             req.flash("success", "Your review was successfully edited.");
-            res.redirect('/campgrounds/' + campground._id);
+            res.redirect('/campgrounds/' + campground.slug);
         });
     });
 });
 
 // Reviews Delete
-router.delete("/campgrounds/:id/reviews/:review_id", middleware.checkReviewOwnership, function (req, res) {
+router.delete("/campgrounds/:slug/reviews/:review_id", middleware.checkReviewOwnership, function (req, res) {
     Review.findByIdAndRemove(req.params.review_id, function (err) {
         if (err) {
             req.flash("error", err.message);
             return res.redirect("back");
         }
-        Campground.findByIdAndUpdate(req.params.id, {$pull: {reviews: req.params.review_id}}, {new: true}).populate("reviews").exec(function (err, campground) {
+		Campground.findOneAndUpdate({slug: req.params.slug}, {$pull: {reviews: req.params.review_id}}, {new: true}).populate("reviews").exec(function (err, campground) {
             if (err) {
                 req.flash("error", err.message);
                 return res.redirect("back");
@@ -111,7 +110,7 @@ router.delete("/campgrounds/:id/reviews/:review_id", middleware.checkReviewOwner
             //save changes
             campground.save();
             req.flash("success", "Your review was deleted successfully.");
-            res.redirect("/campgrounds/" + req.params.id);
+            res.redirect("/campgrounds/" + req.params.slug);
         });
     });
 });
